@@ -5,6 +5,17 @@ import { themes as prismThemes } from "prism-react-renderer";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+const currentYear = new Date().getFullYear();
+
+const copyrightByLocale: Record<string, string> = {
+  en: `Copyright © ${currentYear} open.mp. Built with Docusaurus.`,
+  uk: `Copyright © ${currentYear} open.mp. Створено на Docusaurus.`,
+  "pt-BR": `Copyright © ${currentYear} open.mp. Feito com Docusaurus.`,
+  "zh-CN": `版权所有 © ${currentYear} open.mp。基于Docusaurus构建。`,
+  tr: `Telif Hakkı © ${currentYear} open.mp. Docusaurus ile yapıldı.`,
+  fa: `حق نشر © ${currentYear} open.mp. ساخته شده با Docusaurus.`,
+};
+
 const config: Config = {
   title: "open.mp",
   tagline: "Open Multiplayer",
@@ -29,7 +40,7 @@ const config: Config = {
       removeLegacyPostBuildHeadAttribute: true,
       useCssCascadeLayers: true,
     },
-    experimental_faster: {
+    faster: {
       swcJsLoader: true,
       swcJsMinimizer: true,
       swcHtmlMinimizer: true,
@@ -100,13 +111,17 @@ const config: Config = {
         name: "server-routes-plugin",
         async contentLoaded({ actions }) {
           const { addRoute } = actions;
+          const { i18n: { locales, defaultLocale } } = context;
 
-          // Add the dynamic route
-          addRoute({
-            path: "/servers/",
-            component: "@site/src/pages/servers/index.tsx",
-            exact: false,
-          });
+          // Add the dynamic server detail route.
+          locales.forEach((locale) => {            
+            const prefix = locale === defaultLocale ? '' : `/${locale}`;
+            addRoute({
+              path: `${prefix}/servers/`,
+              component: "@site/src/pages/servers/index",
+              exact: false,
+            });
+          })
         },
       };
     },
@@ -220,6 +235,55 @@ const config: Config = {
     ],
   ],
 
+  headTags: [
+    {
+      tagName: "script",
+      attributes: {},
+      innerHTML: `
+(function() {
+    var locales = ["en","es","ru","ar","bs","de","fil","fr","fa","hu","id","it","nl","pl","pt-BR","ro","sl","sr","ta","th","tr","uk","vi","zh-CN","zh-TW"];
+    var path = window.location.pathname;
+    var firstSegment = path.split("/")[1];
+    
+    if(locales.indexOf(firstSegment) !== -1) {
+        localStorage.setItem("omp-locale", firstSegment);
+        return;
+    }
+
+    var saved = localStorage.getItem("omp-locale");
+
+    if(saved && saved !== "en") {
+        localStorage.setItem("omp-locale", "en");
+        return;
+    }
+
+    if(saved === "en") return;
+
+    var navLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+
+    var map = {
+        "pt": "pt-BR", "pt-br": "pt-BR",
+        "zh": "zh-CN", "zh-cn": "zh-CN", "zh-tw": "zh-TW",
+        "zh-hans": "zh-CN", "zh-hant": "zh-TW"
+    };
+
+    var target = map[navLang] || navLang;
+
+    if(locales.indexOf(target) === -1 && navLang.indexOf("-") !== -1) {
+        target = navLang.split("-")[0];
+    }
+    
+    if(locales.indexOf(target) !== -1 && target !== "en") {
+        localStorage.setItem("omp-locale", target);
+        window.location.href = "/" + target + path + window.location.search + window.location.hash;
+    } else {
+        localStorage.setItem("omp-locale", "en");
+    }
+})();
+      `,
+    },
+  ],
+
   themeConfig: {
     // Replace with your project's social card
     image: "images/assets/wordmark-coloured-bg.png",
@@ -330,7 +394,10 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} open.mp. Built with Docusaurus.`,
+      copyright:
+        copyrightByLocale[
+        process.env.DOCUSAURUS_CURRENT_LOCALE || "en"
+        ] || copyrightByLocale.en,
     },
     prism: {
       theme: prismThemes.github,
@@ -348,10 +415,10 @@ const config: Config = {
       // Optional: see doc section below
       contextualSearch: true,
 
-      // Optional: path for search page that enabled by default (`false` to disable it)
+      // Optional: path for search page that enabled by default (\`false\` to disable it)
       searchPagePath: "search",
 
-      // Optional: whether the insights feature is enabled or not on Docsearch (`false` by default)
+      // Optional: whether the insights feature is enabled or not on Docsearch (\`false\` by default)
       insights: false,
     },
     colorMode: {

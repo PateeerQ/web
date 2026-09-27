@@ -5,7 +5,7 @@ description: Gets the slot of one weapon.
 tags: ["weapon"]
 ---
 
-<versionWarn version='omp v1.1.0.2612' />
+<VersionWarn version='omp v1.1.0.2612' />
 
 ## Description
 
@@ -41,7 +41,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 - [GetPlayerWeaponData](GetPlayerWeaponData): Get the weapon and ammo in a specific player's weapon slot (e.g. the weapon in the 'SMG' slot).
 - [GetPlayerAmmo](GetPlayerAmmo): Gets the amount of ammo in a player's current weapon.
 - [SetPlayerArmedWeapon](SetPlayerArmedWeapon): Sets which weapon (that a player already has) the player is holding.
-- [ResetPlayerWeapon](ResetPlayerWeapons): Removes all weapons from a player.
+- [ResetPlayerWeapons](ResetPlayerWeapons): Removes all weapons from a player.
 - [RemovePlayerWeapon](RemovePlayerWeapon): Remove a specified weapon from a player.
 
 ## Related Resources
